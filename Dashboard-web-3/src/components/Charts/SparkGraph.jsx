@@ -1,6 +1,8 @@
-import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend,} from "chart.js";
-import { lineChartData } from "../fake_data";
+import React from 'react'
+import { Line } from 'react-chartjs-2'
+import { Chart as ChartJS, CategoryScale, LinearScale } from "chart.js" 
+import { SparklineAreaData } from '../../data/dummy'
+
 
 ChartJS.register(
     CategoryScale,
@@ -51,7 +53,7 @@ export const LineGraph = () => {
     };
 
     const data = {
-        labels: lineChartData.map((point) => point.x), // X-axis values
+        labels: SparklineAreaData.map((point) => point.x), // X-axis values
         datasets: [
             {
                 label: "Y Values",

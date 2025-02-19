@@ -1,30 +1,12 @@
 // import {Colors} from "chart.js"
-export const lineChartData = {
-    labels: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday"
-    ],
-    datasets: [
-        {
-            label: "step",
-            data: [3000, 5000, 2000, 7000, 8000, 12000, 15000],
-            borderColor: "rgb(75, 192, 192)"
-        },
-        
-        {
-            label: "Mubashir's step",
-            data: [1000, 3500, 8000, 14000, 4000, 16000, 12000],
-            borderColor: "red",
-            
-        },
-    ],
-    
-};
+export const lineChartData = [
+    { x: 1, yval: 2 },
+    { x: 2, yval: 6 },
+    { x: 3, yval: 8 },
+    { x: 4, yval: 5 },
+    { x: 5, yval: 10 },
+];
+
 
 export const barChartData = {
     labels: ["data", "Groceries", "Utilities", "food", "Transportation"],
