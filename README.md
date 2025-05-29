@@ -44,10 +44,6 @@ Custom Theming: A themes.js file to define custom color palettes and typography.
 Setup and Installation
 To get this project up and running on your local machine, follow these steps:
 
-Clone the repository:
-
-git clone <repository_url>
-cd <project_directory>
 
 Install dependencies:
 

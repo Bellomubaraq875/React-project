@@ -1,27 +1,25 @@
-import React from 'react'
-import { Box, Button, IconButton, Typography, useTheme} from '@mui/material'
-import Header from '../../components/Header'
-import { tokens } from '../../themes'
-import { mockTransactions } from "../../data/mockData"
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined"
-import EmailIcon from "@mui/icons-material/Email"
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale"
-import PersonAddIcon from "@mui/icons-material/PersonAdd"
-import TrafficIcon from "@mui/icons-material/Traffic"
-import LineChart from "../../components/LineChart"
-import BarChart from "../../components/BarChart"
-import PieChart from "../../components/PieChart"
-import GeographyChart from "../../components/GeographyChart"
-// import Statbox from "../../components/Statbox"
-import StatBox from "../../components/Statbox"
-import ProgressCircle from "../../components/ProgressCircle"
+import React from 'react';
+import { Box, Button, IconButton, Typography, useTheme } from '@mui/material';
+import Header from '../../components/Header';
+import { tokens } from '../../themes';
+import { mockTransactions } from "../../data/mockData";
+import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import EmailIcon from "@mui/icons-material/Email";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import TrafficIcon from "@mui/icons-material/Traffic";
+import LineChart from "../../components/LineChart";
+import BarChart from "../../components/BarChart";
+// import PieChart from "../../components/PieChart"; // PieChart is imported but not used, kept it for completeness
+import GeographyChart from "../../components/GeographyChart";
+import StatBox from "../../components/Statbox";
+import ProgressCircle from "../../components/ProgressCircle";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-
- return (
+  return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -128,53 +126,55 @@ const Dashboard = () => {
           />
         </Box>
 
-        {/* ROW 2 */}
+        {/* ROW 2 - Line Chart and Recent Transactions */}
         <Box
-  gridColumn="span 8"
-  gridRow="span 2"
-  backgroundColor={colors.primary[400]}
-  display="flex"
-  flexDirection="column"
->
-  <Box
-    mt="25px"
-    p="0 30px"
-    display="flex "
-    justifyContent="space-between"
-    alignItems="center"
-  >
-    <Box>
-      <Typography
-        variant="h5"
-        fontWeight="600"
-        color={colors.gray[100]}
-      >
-        Revenue Generated
-      </Typography>
-      <Typography
-        variant="h3"
-        fontWeight="bold"
-        color={colors.greenAccent[500]}
-      >
-        $59,342.32
-      </Typography>
-    </Box>
-    <Box>
-      <IconButton>
-        <DownloadOutlinedIcon
-          sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
-        />
-      </IconButton>
-    </Box>
-  </Box>
+          gridColumn="span 8"
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          flexDirection="column"
+        >
+          <Box
+            mt="25px"
+            p="0 30px"
+            display="flex "
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography
+                variant="h5"
+                fontWeight="600"
+                color={colors.gray[100]}
+              >
+                Revenue Generated
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                color={colors.greenAccent[500]}
+              >
+                $59,342.32
+              </Typography>
+            </Box>
+            <Box>
+                <IconButton>
+                <DownloadOutlinedIcon
+                  sx={{ fontSize: "26px", color: colors.greenAccent[500] }}
+                />
+              </IconButton>
+            </Box>
+          </Box>
 
-  <Box
-    flexGrow={1}
-    p="0 20px 20px 20px"
-  >
-    <LineChart />
-  </Box>
-</Box>
+          <Box
+            flexGrow={1}
+            p="0 20px 20px 20px"
+            height="250px"
+            ml="-20px"
+          >
+            <LineChart isDashboard={true} />
+          </Box>
+        </Box>
         <Box
           gridColumn="span 4"
           gridRow="span 2"
@@ -189,7 +189,7 @@ const Dashboard = () => {
             colors={colors.gray[100]} 
             p="15px"
           >
-            <Typography color={colors.gray[100]} variant="h5" fontWeight="600"> {/* Changed grey to gray */}
+            <Typography color={colors.gray[100]} variant="h5" fontWeight="600">
               Recent Transactions
             </Typography>
           </Box>
@@ -210,11 +210,11 @@ const Dashboard = () => {
                 >
                   {transaction.txId}
                 </Typography>
-                <Typography color={colors.gray[100]}> {/* Changed grey to gray */}
+                <Typography color={colors.gray[100]}>
                   {transaction.user}
                 </Typography>
               </Box>
-              <Box color={colors.gray[100]}>{transaction.date}</Box> {/* Changed grey to gray */}
+              <Box color={colors.gray[100]}>{transaction.date}</Box>
               <Box
                 backgroundColor={colors.greenAccent[500]}
                 p="5px 10px"
@@ -226,7 +226,7 @@ const Dashboard = () => {
           ))}
         </Box>
 
-        {/* ROW 3 */}
+        {/* ROW 3 - Campaign, Sales Quantity, and Geography */}
         <Box
           gridColumn="span 4"
           gridRow="span 2"
@@ -265,7 +265,8 @@ const Dashboard = () => {
           >
             Sales Quantity
           </Typography>
-          <Box height="250px" mt="-20px">
+          
+          <Box height="250px" mt="-20px"> 
             <BarChart isDashboard={true} />
           </Box>
         </Box>
@@ -273,7 +274,9 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
-          padding="30px"
+          padding="30px" 
+          display="flex" 
+          flexDirection="column" 
         >
           <Typography
             variant="h5"
@@ -282,13 +285,17 @@ const Dashboard = () => {
           >
             Geography Based Traffic
           </Typography>
-          <Box height="200px" width="100%"> {/* Added width="100%" */}
+          <Box 
+            flexGrow={1}
+            width="100%"
+           
+          >
             <GeographyChart isDashboard={true} />
           </Box>
         </Box>
       </Box>
     </Box>
   );
-}
+};
 
-export default Dashboard
+export default Dashboard;
