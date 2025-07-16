@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+
+import { useState } from "react";
 import { AddressAutofill } from "@mapbox/search-js-react";
-import { svg } from "framer-motion/client";
 
 interface LocationInputProps {
     value: string;
@@ -14,18 +14,55 @@ export function LocationInput({
     onChange,
     onCoordinatesChange,
 }: LocationInputProps) {
-    const inputRef = useRef<HTMLInputElement | null>(null); // ✅ uncommented
     const [isGettingLocation, setIsGettingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+
+    const reverseGeocode = async (latitude: number, longitude: number) => {
+        const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        if (!mapboxAccessToken) {
+            console.warn("Mapbox access token not found. Reverse geocoding will not work.");
+            return null;
+        }
+
+        try {
+            const response = await fetch(
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=address,poi&access_token=${mapboxAccessToken}`
+            );
+            const data = await response.json();
+
+            if (data.features && data.features.length > 0) {
+                // Try to get street address first, then fallback to place name
+                const streetFeature = data.features.find((f: any) =>
+                    f.place_type.includes('address')
+                );
+                const placeFeature = data.features.find((f: any) =>
+                    f.place_type.includes('poi')
+                );
+
+                if (streetFeature) {
+                    return streetFeature.place_name;
+                }
+                if (placeFeature) {
+                    return placeFeature.place_name;
+                }
+                return data.features[0].place_name;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error during reverse geocoding:", error);
+            return null;
+        }
+    };
 
     const getLocation = async () => {
-        setLoading(true);
+        setIsGettingLocation(true);
         setLocationError(null);
+        onChange(""); // Clear previous input while getting location
+        onCoordinatesChange?.(null, null); // Clear previous coordinates
 
         try {
             if (!navigator.geolocation) {
-                throw new Error("Geolocation not supported by this browser.");
+                throw new Error("Geolocation is not supported by your browser");
             }
 
             const position = await new Promise<GeolocationPosition>(
@@ -37,18 +74,18 @@ export function LocationInput({
                                 case error.PERMISSION_DENIED:
                                     reject(
                                         new Error(
-                                            "Please allow location access in your browser settings"
+                                            "Permission denied. Please allow location access in your browser settings."
                                         )
                                     );
                                     break;
                                 case error.POSITION_UNAVAILABLE:
-                                    reject(new Error("Location unavailable"));
+                                    reject(new Error("Location information is unavailable."));
                                     break;
                                 case error.TIMEOUT:
-                                    reject(new Error("Location request timed out"));
+                                    reject(new Error("Location request timed out."));
                                     break;
                                 default:
-                                    reject(new Error("An unknown error occurred")); 
+                                    reject(new Error("An unknown error occurred while getting location."));
                             }
                         },
                         {
@@ -62,92 +99,67 @@ export function LocationInput({
 
             const { latitude, longitude } = position.coords;
             onCoordinatesChange?.(latitude, longitude);
-            onChange(`${latitude.toFixed(6)} ${longitude.toFixed(6)}`); 
+
+            const detectedAddress = await reverseGeocode(latitude, longitude);
+            onChange(detectedAddress || `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`);
         } catch (error) {
             console.error("Location error:", error);
             setLocationError(
                 error instanceof Error ? error.message : "Unable to get your location"
-            ); 
+            );
         } finally {
             setIsGettingLocation(false);
-            setLoading(false); 
         }
     };
 
     return (
         <div className="space-y-2">
-            <label htmlFor="location" className="block text-sm text-zinc-400 mb-1">
-                Incident Location
+            <label className="block text-sm font-medium text-zinc-400">
+                Location
             </label>
-
             <div className="relative">
                 <AddressAutofill
-                accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}
-                >
+                    accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}>
                     <input
-                    type="text"
-                    autoComplete="street-address"
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder="Enter location or use pin"
-                    className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 pl-4 pr-12 py-3.5 text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
-                    >
-                    </input>
+                        type="text"
+                        autoComplete="street-address"
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        placeholder="Enter location or click the pin to auto-detect"
+                        className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 pl-4 pr-12 py-3.5
+                     text-white transition-colors duration-200
+                     focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                    />
                 </AddressAutofill>
                 <button
-                type="button"
-                onClick={getLocation}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-sky-500/20 text-sky-400 hover:bg-sky-500/20 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isGettingLocation}
-                title="Get current location"
-                >
+                    type="button"
+                    onClick={getLocation}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5
+                   rounded-lg bg-sky-500/10 text-sky-400 
+                   hover:bg-sky-500/20 transition-colors duration-200
+                   disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isGettingLocation}
+                    title="Get current location">
                     {isGettingLocation ? (
-                        <svg
-                            className="animte-spin h-5 w-5"
-                            xmlns="http://w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                // className="h-5 w-5"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0  5.373 0 12h4zm2 5.291A7.962"
-
-                            ></path>
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                    ): (
-                        <svg
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        ><path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244"
-                        /><path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
+                    ) : (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     )}
                 </button>
             </div>
-            
-
             {locationError && (
-                <p className="text-sm text-red-500 mt-1">{locationError}</p>
+                <p className="text-sm text-red-400 flex items-center gap-2">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    {locationError}
+                </p>
             )}
         </div>
     );
