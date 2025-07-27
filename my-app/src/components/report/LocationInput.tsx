@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { AddressAutofill } from "@mapbox/search-js-react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface LocationInputProps {
     value: string;
@@ -16,36 +15,37 @@ export function LocationInput({
 }: LocationInputProps) {
     const [isGettingLocation, setIsGettingLocation] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const reverseGeocode = async (latitude: number, longitude: number) => {
-        const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-        if (!mapboxAccessToken) {
-            console.warn("Mapbox access token not found. Reverse geocoding will not work.");
-            return null;
+    // This useEffect hook automatically triggers the location detection on component load
+    useEffect(() => {
+        // Only run if the input value is currently empty
+        // This prevents overwriting an address from a form state or hardcoded value
+        if (!value) {
+            getLocation();
         }
+    // The empty dependency array ensures this effect runs only once on mount
+    }, []);
 
+    // Function to handle reverse geocoding using Nominatim
+    const reverseGeocode = async (latitude: number, longitude: number) => {
+        const userAgent = "YourAppName/1.0 (contact@yourapp.com)";
         try {
             const response = await fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?types=address,poi&access_token=${mapboxAccessToken}`
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+                {
+                    headers: {
+                        "User-Agent": userAgent,
+                    },
+                }
             );
+
             const data = await response.json();
 
-            if (data.features && data.features.length > 0) {
-                // Try to get street address first, then fallback to place name
-                const streetFeature = data.features.find((f: any) =>
-                    f.place_type.includes('address')
-                );
-                const placeFeature = data.features.find((f: any) =>
-                    f.place_type.includes('poi')
-                );
-
-                if (streetFeature) {
-                    return streetFeature.place_name;
-                }
-                if (placeFeature) {
-                    return placeFeature.place_name;
-                }
-                return data.features[0].place_name;
+            if (data.display_name) {
+                return data.display_name;
             }
             return null;
         } catch (error) {
@@ -54,11 +54,52 @@ export function LocationInput({
         }
     };
 
+    // Function to handle forward geocoding (search/autocomplete) using Nominatim
+    const searchNominatim = useCallback(async (query: string) => {
+        if (!query) {
+            setSuggestions([]);
+            return;
+        }
+        setIsSearching(true);
+        const userAgent = "YourAppName/1.0 (contact@yourapp.com)";
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=ng`,
+                {
+                    headers: {
+                        "User-Agent": userAgent,
+                    },
+                }
+            );
+            const data = await response.json();
+            setSuggestions(data);
+        } catch (error) {
+            console.error("Error during geocoding search:", error);
+            setSuggestions([]);
+        } finally {
+            setIsSearching(false);
+        }
+    }, []);
+
+    // Effect to trigger search on input value change (with a debounce for performance)
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (value) {
+                searchNominatim(value);
+            } else {
+                setSuggestions([]);
+            }
+        }, 500); // Debounce delay
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, searchNominatim]);
+
     const getLocation = async () => {
         setIsGettingLocation(true);
         setLocationError(null);
-        onChange(""); // Clear previous input while getting location
-        onCoordinatesChange?.(null, null); // Clear previous coordinates
+        onChange("");
+        onCoordinatesChange?.(null, null);
 
         try {
             if (!navigator.geolocation) {
@@ -112,32 +153,49 @@ export function LocationInput({
         }
     };
 
+    const handleSuggestionClick = (suggestion: any) => {
+        const { lat, lon, display_name } = suggestion;
+        onChange(display_name);
+        onCoordinatesChange?.(parseFloat(lat), parseFloat(lon));
+        setSuggestions([]);
+    };
+
     return (
         <div className="space-y-2">
             <label className="block text-sm font-medium text-zinc-400">
                 Location
             </label>
             <div className="relative">
-                <AddressAutofill
-                    accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}>
-                    <input
-                        type="text"
-                        autoComplete="street-address"
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        placeholder="Enter location or click the pin to auto-detect"
-                        className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 pl-4 pr-12 py-3.5
-                     text-white transition-colors duration-200
-                     focus:outline-none focus:ring-2 focus:ring-sky-500/40"
-                    />
-                </AddressAutofill>
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder="Enter location or click the pin to auto-detect"
+                    className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 pl-4 pr-12 py-3.5
+                    text-white transition-colors duration-200
+                    focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                />
+                {suggestions.length > 0 && (
+                    <ul className="absolute z-10 w-full bg-zinc-900/70 backdrop-blur-md border border-zinc-700 rounded-xl mt-1 max-h-60 overflow-y-auto">
+                        {suggestions.map((suggestion, index) => (
+                            <li
+                                key={index}
+                                onClick={() => handleSuggestionClick(suggestion)}
+                                className="p-3 text-sm text-white cursor-pointer hover:bg-zinc-800 transition-colors duration-200"
+                            >
+                                {suggestion.display_name}
+                            </li>
+                        ))}
+                    </ul>
+                )}
                 <button
                     type="button"
                     onClick={getLocation}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5
-                   rounded-lg bg-sky-500/10 text-sky-400 
-                   hover:bg-sky-500/20 transition-colors duration-200
-                   disabled:opacity-50 disabled:cursor-not-allowed"
+                    rounded-lg bg-sky-500/10 text-sky-400 
+                    hover:bg-sky-500/20 transition-colors duration-200
+                    disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isGettingLocation}
                     title="Get current location">
                     {isGettingLocation ? (
