@@ -45,16 +45,9 @@ export function ReportForm({ onComplete }: ReportFormProps) {
     setIsAnalyzing(true);
 
     try {
-      const base64 = await new Promise<string>((resolve, reject) => { // Explicitly type resolve
+      const base64 = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onloadend = () => {
-          if (typeof reader.result === 'string') {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Failed to read file as base64."));
-          }
-        };
-        reader.onerror = () => reject(new Error("File reading error."));
+        reader.onloadend = () => resolve(reader.result);
         reader.readAsDataURL(file);
       });
 
@@ -66,29 +59,23 @@ export function ReportForm({ onComplete }: ReportFormProps) {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Image analysis failed");
-      }
-
-      if (data.title || data.description || data.reportType) {
+      if (data.title && data.description && data.reportType) {
         setFormData((prev) => ({
           ...prev,
-          title: data.title || prev.title, // Only update if data.title exists
-          description: data.description || prev.description, // Only update if data.description exists
-          specificType: data.reportType || prev.specificType, // Only update if data.reportType exists
+          title: data.title,
+          description: data.description,
+          specificType: data.reportType,
         }));
-        setImage(base64);
+        setImage(base64 as string);
       }
     } catch (error) {
       console.error("Error analyzing image:", error);
-      // Optionally, set an error message to display to the user
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   const generateReportId = useCallback(() => {
-    // Generate a unique ID using crypto.randomBytes and SHA256
     const timestamp = Date.now().toString();
     const randomBytes = crypto.randomBytes(16).toString("hex");
     const combinedString = `${timestamp}-${randomBytes}`;
@@ -110,12 +97,11 @@ export function ReportForm({ onComplete }: ReportFormProps) {
         specificType: formData.specificType,
         title: formData.title,
         description: formData.description,
-        location: formData.location, // This will be the address string or coordinates string
+        location: formData.location,
         latitude: coordinates.latitude,
         longitude: coordinates.longitude,
         image: image,
-        status: "PENDING", // Initial status
-        timestamp: new Date().toISOString(), // Add timestamp for when report was created
+        status: "PENDING",
       };
 
       const response = await fetch("/api/reports/create", {
@@ -132,10 +118,9 @@ export function ReportForm({ onComplete }: ReportFormProps) {
         throw new Error(result.error || "Failed to submit report");
       }
 
-      onComplete(result); // Call onComplete with the result from the API
+      onComplete(result);
     } catch (error) {
       console.error("Error submitting report:", error);
-      // Optionally, set an error message to display to the user
     } finally {
       setIsSubmitting(false);
     }
@@ -153,13 +138,15 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           className={`p-6 rounded-2xl border-2 transition-all duration-200 ${formData.incidentType === "EMERGENCY"
               ? "bg-red-500/20 border-red-500 shadow-lg shadow-red-500/20"
               : "bg-zinc-900/50 border-zinc-800 hover:bg-red-500/10 hover:border-red-500/50"
-            }`}>
+            }`}
+        >
           <div className="flex flex-col items-center space-y-2">
             <svg
               className="w-8 h-8 text-red-500"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -182,13 +169,15 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           className={`p-6 rounded-2xl border-2 transition-all duration-200 ${formData.incidentType === "NON_EMERGENCY"
               ? "bg-orange-500/20 border-orange-500 shadow-lg shadow-orange-500/20"
               : "bg-zinc-900/50 border-zinc-800 hover:bg-orange-500/10 hover:border-orange-500/50"
-            }`}>
+            }`}
+        >
           <div className="flex flex-col items-center space-y-2">
             <svg
               className="w-8 h-8 text-orange-500"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="currentColor">
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -215,11 +204,11 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           htmlFor="image-upload"
           className="block w-full p-8 border-2 border-dashed border-zinc-700 rounded-2xl 
                    hover:border-sky-500/50 hover:bg-sky-500/5 transition-all duration-200
-                   cursor-pointer text-center">
+                   cursor-pointer text-center"
+        >
           {image ? (
             <div className="space-y-4">
               <div className="w-full h-48 relative rounded-lg overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={image}
                   alt="Preview"
@@ -234,7 +223,8 @@ export function ReportForm({ onComplete }: ReportFormProps) {
                 className="mx-auto h-12 w-12 text-zinc-500"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor">
+                stroke="currentColor"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -255,18 +245,21 @@ export function ReportForm({ onComplete }: ReportFormProps) {
                 className="animate-spin h-5 w-5 text-sky-500"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 0 24 24">
+                viewBox="0 0 24 24"
+              >
                 <circle
                   className="opacity-25"
                   cx="12"
                   cy="12"
                   r="10"
                   stroke="currentColor"
-                  strokeWidth="4"></circle>
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               <span className="text-sky-500 font-medium">
                 Analyzing image...
@@ -289,7 +282,8 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 px-4 py-3.5
                    text-white transition-colors duration-200
                    focus:outline-none focus:ring-2 focus:ring-sky-500/40"
-          required>
+          required
+        >
           <option value="">Select type</option>
           {REPORT_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -356,7 +350,8 @@ export function ReportForm({ onComplete }: ReportFormProps) {
         className="w-full relative group overflow-hidden rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 
                  px-4 py-3.5 text-sm font-medium text-white shadow-lg
                  transition-all duration-200 hover:from-sky-400 hover:to-blue-500
-                 disabled:opacity-50 disabled:cursor-not-allowed">
+                 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
         <div className="relative flex items-center justify-center gap-2">
           {isSubmitting ? (
             <>
@@ -364,18 +359,21 @@ export function ReportForm({ onComplete }: ReportFormProps) {
                 className="animate-spin h-4 w-4"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 0 24 24">
+                viewBox="0 0 24 24"
+              >
                 <circle
                   className="opacity-25"
                   cx="12"
                   cy="12"
                   r="10"
                   stroke="currentColor"
-                  strokeWidth="4"></circle>
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               <span>Submitting...</span>
             </>
@@ -386,7 +384,8 @@ export function ReportForm({ onComplete }: ReportFormProps) {
                 className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor">
+                stroke="currentColor"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
