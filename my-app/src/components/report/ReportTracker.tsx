@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Loader } from "lucide-react"; // Assuming lucide-react is installed
+import { Search, Loader } from "lucide-react";
 
 interface ReportDetails {
     id: string;
@@ -12,8 +12,6 @@ interface ReportDetails {
     title: string;
     description: string;
     location: string;
-    // Add other fields you expect to receive from the API if needed for display
-    // e.g., specificType, latitude, longitude, image, analysis, timeline
 }
 
 export function ReportTracker() {
@@ -23,7 +21,7 @@ export function ReportTracker() {
     const [reportDetails, setReportDetails] = useState<ReportDetails | null>(
         null
     );
-    const router = useRouter(); // router is used for navigation, not directly for tracking in this component
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,23 +38,12 @@ export function ReportTracker() {
         try {
             const response = await fetch(`/api/reports/${reportId}/details`);
             if (!response.ok) {
-                // Check if the response status indicates not found (e.g., 404)
-                if (response.status === 404) {
-                    throw new Error("Report not found. Please check the ID.");
-                }
-                // For other errors, try to parse the error message from the response body
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to fetch report details.");
+                throw new Error("Report not found");
             }
             const data = await response.json();
             setReportDetails(data);
         } catch (err) {
-            console.error("Error fetching report:", err);
-            setError(
-                err instanceof Error
-                    ? err.message
-                    : "Unable to find report. Please check the ID and try again."
-            );
+            setError("Unable to find report. Please check the ID and try again.");
         } finally {
             setLoading(false);
         }
@@ -88,17 +75,20 @@ export function ReportTracker() {
           ${reportDetails
                             ? "w-full grid md:grid-cols-2 gap-8"
                             : "max-w-lg w-full"
-                        }`}>
+                        }`}
+                >
                     {/* Form Section */}
                     <div
                         className={`bg-zinc-900/50 backdrop-blur-xl rounded-2xl border 
             border-white/5 p-6 w-full transition-all duration-300
-            ${reportDetails ? "" : "mx-auto"}`}>
+            ${reportDetails ? "" : "mx-auto"}`}
+                    >
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="relative">
                                 <label
                                     htmlFor="reportId"
-                                    className="block text-sm font-medium mb-2 text-zinc-400">
+                                    className="block text-sm font-medium mb-2 text-zinc-400"
+                                >
                                     Report ID
                                 </label>
                                 <input
@@ -120,7 +110,8 @@ export function ReportTracker() {
                                         className="h-5 w-5 flex-shrink-0"
                                         fill="none"
                                         viewBox="0 0 24 24"
-                                        stroke="currentColor">
+                                        stroke="currentColor"
+                                    >
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -139,7 +130,8 @@ export function ReportTracker() {
                          text-white py-3 px-4 rounded-xl hover:from-sky-400 
                          hover:to-blue-500 transition-all duration-200 
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         flex items-center justify-center space-x-2">
+                         flex items-center justify-center space-x-2"
+                            >
                                 {loading ? (
                                     <Loader className="w-5 h-5 animate-spin" />
                                 ) : (
@@ -155,8 +147,9 @@ export function ReportTracker() {
                         className={`transition-all duration-300 
             ${reportDetails
                                 ? "opacity-100 translate-x-0"
-                                : "opacity-0 translate-x-8 absolute" // Absolute positioning hides it more completely when not active
-                            }`}>
+                                : "opacity-0 translate-x-8 absolute"
+                            }`}
+                    >
                         {reportDetails && (
                             <div className="rounded-xl border border-white/5 bg-black/30 backdrop-blur-xl p-6 h-full">
                                 <h2 className="text-xl font-semibold text-white flex items-center gap-2 mb-6">
@@ -171,7 +164,8 @@ export function ReportTracker() {
                                             className={`font-medium ${getStatusColor(
                                                 reportDetails.status
                                             )} 
-                        px-3 py-1 rounded-full bg-white/5`}>
+                        px-3 py-1 rounded-full bg-white/5`}
+                                        >
                                             {reportDetails.status.toUpperCase()}
                                         </span>
                                     </div>
@@ -227,15 +221,12 @@ export function ReportTracker() {
     );
 }
 
-// Helper function for status colors
 function getStatusColor(status: string): string {
     const statusColors: Record<string, string> = {
         pending: "text-yellow-400",
         processing: "text-sky-400",
-        completed: "text-emerald-400", // Using emerald for completed/resolved
-        resolved: "text-emerald-400", // Aligning with completed
+        completed: "text-emerald-400",
         failed: "text-red-400",
-        "in progress": "text-sky-400", // For consistency
     };
     return statusColors[status.toLowerCase()] || "text-white";
 }
