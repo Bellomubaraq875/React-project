@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
+    "@fontsource/outfit": "^5.2.6",
+    "@fontsource/poppins": "^5.2.6",
     "@reduxjs/toolkit": "^2.8.2",
     "antd": "^5.27.2",
     "axios": "^1.11.0",

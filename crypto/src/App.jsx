@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import { Layout, Typography, Space } from 'antd'
 
-import Navbar from './Components/Navbar'
-import Footer from './Components/Footer' 
+import { Navbar, Exchange, Homepage, CryptoDetails, Cryptocurrencies, News, Footer } from './Components'
 import "./App.css"
+
 
 function App() {
   return (
@@ -13,9 +12,28 @@ function App() {
         <Navbar />
       </div>
       <div className="main">
-      </div>
-      <div className="footer">
-        {/* <Footer /> */}
+        <Layout>
+          <div className="routes">
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/exchange" element={<Exchange />} />
+              <Route path="/cryptocurrencies" element={<Cryptocurrencies />} />
+              <Route path="/crypto/:coinId" element={<CryptoDetails />} />
+              <Route path="/news" element={<News />} />
+            </Routes>
+          </div>
+        </Layout>
+        <div className="footer" >
+          <Typography.Title level={5} style={{color: 'white', textAlign: 'center'}}>
+            Cryptoc <br/>
+            All rights reservered
+          </Typography.Title>
+          <Space>
+            <Link to='/'>Home</Link>
+            <Link to='/exchange'>Exchange</Link>
+            <Link to='/news'>News</Link>
+          </Space>
+        </div>  
       </div>
     </div>
   )
