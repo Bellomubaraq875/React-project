@@ -5,10 +5,12 @@ import { useGetCryptoNewsQuery } from "../Services/cryptoNewsApi";
 
 const { Title } = Typography;
 const { Option } = Select;
+const demoImage =
+  "https://via.placeholder.com/200x120.png?text=No+Image"; // fallback image
 
 const News = ({ simplified }) => {
   const [pageToken, setPageToken] = useState("");
-  const [category, setCategory] = useState("cryptocurrency"); // ✅ default category
+  const [category, setCategory] = useState("cryptocurrency");
 
   const { data: cryptoNews, isFetching } = useGetCryptoNewsQuery({
     newsCategory: category,
@@ -47,14 +49,26 @@ const News = ({ simplified }) => {
       <Row gutter={[24, 24]}>
         {newsList.map((news, i) => (
           <Col xs={24} sm={12} lg={8} key={i}>
-            <Card hoverable className="news-card">
+            <Card
+              hoverable
+              className="news-card"
+              cover={
+                <img
+                  alt={news.title}
+                  src={news.image_url || demoImage}
+                  style={{ height: "180px", objectFit: "cover" }}
+                />
+              }
+            >
               <a href={news.link} target="_blank" rel="noreferrer">
-                <div className="news-image-container">
-                  <Title level={4}>{news.title}</Title>
-                </div>
-                <p>{news.description?.slice(0, 100) || "No description"}</p>
+                <Title level={4}>{news.title}</Title>
+                <p>
+                  {news.description
+                    ? news.description.slice(0, 120) + "..."
+                    : "No description"}
+                </p>
                 <div className="provider-container">
-                  <small>{moment(news.pubDate).startOf("ss").fromNow()}</small>
+                  <small>{moment(news.pubDate).fromNow()}</small>
                 </div>
               </a>
             </Card>
@@ -64,7 +78,13 @@ const News = ({ simplified }) => {
 
       {/* ✅ Pagination only for full page */}
       {!simplified && (
-        <div style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            margin: "20px 0",
+          }}
+        >
           <Button
             type="default"
             disabled={!cryptoNews?.previousPage}
