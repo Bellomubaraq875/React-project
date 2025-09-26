@@ -1,26 +1,21 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const cryptoNewsHeaders = {
-    "x-rapidapi-key": "4544c57a1emsh81a3e1a2e38d39fp19361fjsn514cbf69bc76",
-    "x-rapidapi-host": "bing-news-search1.p.rapidapi.com",
-    "X-BingApis-SDK": "true",
-};
+const baseUrl = "https://newsdata.io/api/1";
+const apiKey = "pub_5cca991e541f4b228fb1fef8d7d8a6d5";
 
-const baseUrl = "https://bing-news-search1.p.rapidapi.com";
-
-const createRequest = (url) => ({ url, headers: cryptoNewsHeaders });
+const createRequest = (url) => `${url}&apikey=${apiKey}`;
 
 export const cryptoNewsApi = createApi({
-    reducerPath: "cryptoNewsApi",
-    baseQuery: fetchBaseQuery({ baseUrl }),
-    endpoints: (builder) => ({
-        getCryptoNews: builder.query({
-            query: ({ newsCategory, count }) =>
-                createRequest(
-                    `/news/search?q=${newsCategory}&safeSearch=Off&textFormat=Raw&freshness=Day&count=${count}`
-                ),
-        }),
+  reducerPath: "cryptoNewsApi",
+  baseQuery: fetchBaseQuery({ baseUrl }),
+  endpoints: (builder) => ({
+    getCryptoNews: builder.query({
+      query: ({ newsCategory = "cryptocurrency", page = "" }) =>
+        createRequest(
+          `/news?q=${newsCategory}&language=en${page ? `&page=${page}` : ""}`
+        ),
     }),
+  }),
 });
 
 export const { useGetCryptoNewsQuery } = cryptoNewsApi;
