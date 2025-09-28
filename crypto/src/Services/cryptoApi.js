@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createRequestHandler } from "react-router-dom";
 
 export const cryptoApi = createApi({
     reducerPath: "cryptoApi",
@@ -6,7 +7,7 @@ export const cryptoApi = createApi({
     endpoints: (builder) => ({
         getCryptos: builder.query({
             async queryFn(count = 50, _queryApi, _extraOptions, fetchWithBQ) {
-                const perPage = 250; // CoinGecko max
+                const perPage = 250; 
                 const pagesNeeded = Math.ceil(count / perPage);
                 let allCoins = [];
 
@@ -18,9 +19,13 @@ export const cryptoApi = createApi({
                     allCoins = [...allCoins, ...response.data];
                 }
 
-                return { data: allCoins.slice(0, count) }; // trim to requested count
+                return { data: allCoins.slice(0, count) };
+
             },
         }),
+        getCryptoDetails: builder.query({
+            query: (coinId) => createRequest(`/coins/${coinId}`), 
+        })
     }),
 });
 
