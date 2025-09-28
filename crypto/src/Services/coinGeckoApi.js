@@ -1,29 +1,30 @@
-// src/Services/coinGeckoApi.js
+// src/services/coinGeckoApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const baseUrl = "https://api.coingecko.com/api/v3";
 
 export const coinGeckoApi = createApi({
     reducerPath: "coinGeckoApi",
-    baseQuery: fetchBaseQuery({ baseUrl }),
+    baseQuery: fetchBaseQuery({ baseUrl: "https://api.coingecko.com/api/v3" }),
     endpoints: (builder) => ({
+        // ✅ Get coins list (with market data)
         getCryptos: builder.query({
-            query: (count = 10) =>
-                `/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${count}&page=1&sparkline=false`,
+            query: (limit = 100) =>
+                `/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1&sparkline=false`,
         }),
 
+        // ✅ Get coin details
         getCryptoDetails: builder.query({
             query: (coinId) => `/coins/${coinId}`,
         }),
 
-        // ✅ New history endpoint for LineChart
+        // ✅ Get coin market chart (history)
         getCryptoHistory: builder.query({
-            query: ({ coinId, timeperiod = "7" }) =>
-                `/coins/${coinId}/market_chart?vs_currency=usd&days=${timeperiod}&interval=daily`,
+            query: ({ coinId, timeperiod }) =>
+                `/coins/${coinId}/market_chart?vs_currency=usd&days=${timeperiod}`,
         }),
 
+        // ✅ Get exchanges list
         getExchanges: builder.query({
-            query: () => `/exchanges?per_page=50&page=1`,
+            query: (limit = 50) => `/exchanges?per_page=${limit}&page=1`,
         }),
     }),
 });

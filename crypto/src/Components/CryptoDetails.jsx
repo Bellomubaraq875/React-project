@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import HTMLReactParser from 'html-react-parser';
-import { useParams } from 'react-router-dom';
-import millify from 'millify';
-import { Col, Row, Typography, Select } from 'antd';
+import React, { useState } from "react";
+import HTMLReactParser from "html-react-parser";
+import { useParams } from "react-router-dom";
+import millify from "millify";
+import { Col, Row, Typography, Select } from "antd";
 import {
   MoneyCollectOutlined,
   DollarCircleOutlined,
@@ -13,78 +13,62 @@ import {
   CheckOutlined,
   NumberOutlined,
   ThunderboltOutlined,
-} from '@ant-design/icons';
-import axios from 'axios';
+} from "@ant-design/icons";
 
-import Loader from './Loader';
-import LineChart from './LineChart';
+import {
+  useGetCryptoDetailsQuery,
+  useGetCryptoHistoryQuery,
+} from "../Services/coinGeckoApi";
+import Loader from "./Loader";
+import LineChart from "./LineChart";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const CryptoDetails = () => {
   const { coinId } = useParams();
-  const [timeperiod, setTimeperiod] = useState('7');
-  const [cryptoDetails, setCryptoDetails] = useState(null);
-  const [coinHistory, setCoinHistory] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  const time = [
-    { label: '24h', value: '1' },
-    { label: '7d', value: '7' },
-    { label: '30d', value: '30' },
-    { label: '90d', value: '90' },
-    { label: '1y', value: '365' },
+  // ✅ Map UI-friendly values to CoinGecko-supported `days`
+  const timeOptions = [
+    { label: "24h", value: "1" },
+    { label: "7d", value: "7" },
+    { label: "30d", value: "30" },
+    { label: "90d", value: "90" },
+    { label: "1y", value: "365" },
+    { label: "Max", value: "max" },
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Get coin details
-        const { data: coinData } = await axios.get(
-          `https://api.coingecko.com/api/v3/coins/${coinId}`
-        );
-        setCryptoDetails(coinData);
+  const [timeperiod, setTimeperiod] = useState("7");
 
-        // Get coin history (market chart)
-        const { data: historyData } = await axios.get(
-          `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart`,
-          {
-            params: { vs_currency: 'usd', days: timeperiod },
-          }
-        );
-        setCoinHistory(historyData);
-      } catch (err) {
-        console.error('Error fetching coin details:', err);
-      }
-      setLoading(false);
-    };
+  const { data: details, isFetching } = useGetCryptoDetailsQuery(coinId);
+  const { data: coinHistory } = useGetCryptoHistoryQuery({
+    coinId,
+    timeperiod,
+  });
 
-    fetchData();
-  }, [coinId, timeperiod]);
+  const cryptoDetails = details;
 
-  if (loading || !cryptoDetails) return <Loader />;
+  if (isFetching) return <Loader />;
 
   const stats = [
     {
-      title: 'Price to USD',
+      title: "Price to USD",
       value: `$ ${cryptoDetails?.market_data?.current_price?.usd && millify(cryptoDetails.market_data.current_price.usd)}`,
       icon: <DollarCircleOutlined />,
     },
-    { title: 'Rank', value: cryptoDetails?.market_cap_rank, icon: <NumberOutlined /> },
+    { title: "Rank", value: cryptoDetails?.market_cap_rank, icon: <NumberOutlined /> },
     {
-      title: '24h Volume',
+      title: "24h Volume",
       value: `$ ${cryptoDetails?.market_data?.total_volume?.usd && millify(cryptoDetails.market_data.total_volume.usd)}`,
       icon: <ThunderboltOutlined />,
     },
     {
-      title: 'Market Cap',
+      title: "Market Cap",
       value: `$ ${cryptoDetails?.market_data?.market_cap?.usd && millify(cryptoDetails.market_data.market_cap.usd)}`,
       icon: <DollarCircleOutlined />,
     },
     {
-      title: 'All-time-high',
+      title: "All-time-high",
       value: `$ ${cryptoDetails?.market_data?.ath?.usd && millify(cryptoDetails.market_data.ath.usd)}`,
       icon: <TrophyOutlined />,
     },
@@ -92,23 +76,40 @@ const CryptoDetails = () => {
 
   const genericStats = [
     {
-      title: 'Number Of Markets',
-      value: cryptoDetails?.tickers?.length,
+      title: "Number Of Markets",
+      value: cryptoDetails?.tickers?.length || "N/A",
       icon: <FundOutlined />,
     },
     {
-      title: 'Aprroved Supply',
-      value: cryptoDetails?.market_data?.circulating_supply ? <CheckOutlined /> : <StopOutlined />,
+      title: "Number Of Exchanges",
+      value: cryptoDetails?.tickers
+        ? new Set(cryptoDetails.tickers.map((t) => t.market.name)).size
+        : "N/A",
+      icon: <MoneyCollectOutlined />,
+    },
+    {
+      title: "Approved Supply",
+      value: cryptoDetails?.market_data?.circulating_supply
+        ? <CheckOutlined />
+        : <StopOutlined />,
       icon: <ExclamationCircleOutlined />,
     },
     {
-      title: 'Total Supply',
-      value: `$ ${cryptoDetails?.market_data?.total_supply && millify(cryptoDetails.market_data.total_supply)}`,
+      title: "Total Supply",
+      value: `$ ${
+        cryptoDetails?.market_data?.total_supply
+          ? millify(cryptoDetails.market_data.total_supply)
+          : "N/A"
+      }`,
       icon: <ExclamationCircleOutlined />,
     },
     {
-      title: 'Circulating Supply',
-      value: `$ ${cryptoDetails?.market_data?.circulating_supply && millify(cryptoDetails.market_data.circulating_supply)}`,
+      title: "Circulating Supply",
+      value: `$ ${
+        cryptoDetails?.market_data?.circulating_supply
+          ? millify(cryptoDetails.market_data.circulating_supply)
+          : "N/A"
+      }`,
       icon: <ExclamationCircleOutlined />,
     },
   ];
@@ -125,15 +126,15 @@ const CryptoDetails = () => {
         </p>
       </Col>
 
+      {/* ✅ Updated time period select */}
       <Select
         defaultValue="7"
         className="select-timeperiod"
-        placeholder="Select Timeperiod"
         onChange={(value) => setTimeperiod(value)}
       >
-        {time.map((t) => (
-          <Option key={t.value} value={t.value}>
-            {t.label}
+        {timeOptions.map((opt) => (
+          <Option key={opt.value} value={opt.value}>
+            {opt.label}
           </Option>
         ))}
       </Select>
@@ -152,11 +153,11 @@ const CryptoDetails = () => {
             </Title>
             <p>
               An overview showing the statistics of {cryptoDetails?.name}, such
-              as rank, volume, and market cap.
+              as the base and quote currency, the rank, and trading volume.
             </p>
           </Col>
-          {stats.map(({ icon, title, value }) => (
-            <Col className="coin-stats" key={title}>
+          {stats.map(({ icon, title, value }, idx) => (
+            <Col className="coin-stats" key={idx}>
               <Col className="coin-stats-name">
                 <Text>{icon}</Text>
                 <Text>{title}</Text>
@@ -171,13 +172,9 @@ const CryptoDetails = () => {
             <Title level={3} className="coin-details-heading">
               Other Stats Info
             </Title>
-            <p>
-              An overview showing the statistics of {cryptoDetails?.name}, such
-              as supply and markets.
-            </p>
           </Col>
-          {genericStats.map(({ icon, title, value }) => (
-            <Col className="coin-stats" key={title}>
+          {genericStats.map(({ icon, title, value }, idx) => (
+            <Col className="coin-stats" key={idx}>
               <Col className="coin-stats-name">
                 <Text>{icon}</Text>
                 <Text>{title}</Text>
@@ -193,28 +190,24 @@ const CryptoDetails = () => {
           <Title level={3} className="coin-details-heading">
             What is {cryptoDetails?.name}?
           </Title>
-          {HTMLReactParser(cryptoDetails?.description?.en || '')}
+          {cryptoDetails?.description?.en &&
+            HTMLReactParser(cryptoDetails.description.en)}
         </Row>
-
         <Col className="coin-links">
           <Title level={3} className="coin-details-heading">
             {cryptoDetails?.name} Links
           </Title>
-          {cryptoDetails?.links?.homepage?.[0] && (
-            <Row className="coin-link">
-              <Title level={5} className="link-name">Website</Title>
-              <a href={cryptoDetails.links.homepage[0]} target="_blank" rel="noreferrer">
-                {cryptoDetails.links.homepage[0]}
-              </a>
-            </Row>
-          )}
-          {cryptoDetails?.links?.subreddit_url && (
-            <Row className="coin-link">
-              <Title level={5} className="link-name">Reddit</Title>
-              <a href={cryptoDetails.links.subreddit_url} target="_blank" rel="noreferrer">
-                {cryptoDetails.links.subreddit_url}
-              </a>
-            </Row>
+          {cryptoDetails?.links?.homepage?.map((link, idx) =>
+            link ? (
+              <Row className="coin-link" key={idx}>
+                <Title level={5} className="link-name">
+                  Homepage
+                </Title>
+                <a href={link} target="_blank" rel="noreferrer">
+                  {link}
+                </a>
+              </Row>
+            ) : null
           )}
         </Col>
       </Col>

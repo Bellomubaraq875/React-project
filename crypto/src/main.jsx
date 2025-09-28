@@ -5,6 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import 'antd/dist/reset.css'
 import { store } from "./App/store";
+import "./chartconfig.js"
 import '@fontsource/poppins/400.css';
 import '@fontsource/outfit/400.css';
 

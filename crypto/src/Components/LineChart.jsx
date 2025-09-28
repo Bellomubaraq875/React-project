@@ -5,34 +5,41 @@ import { Col, Row, Typography } from "antd";
 const { Title } = Typography;
 
 const LineChart = ({ coinHistory, currentPrice, coinName }) => {
-  const coinPrice = [];
-  const coinTimestamp = [];
-
-  for (let i = 0; i < coinHistory?.prices?.length; i += 1) {
-    coinPrice.push(coinHistory.prices[i][1]); // price
-    coinTimestamp.push(
-      new Date(coinHistory.prices[i][0]).toLocaleDateString()
-    ); // timestamp
+  if (!coinHistory || !coinHistory.prices) {
+    return <p>No chart data available</p>;
   }
+
+  // Extract prices & timestamps from CoinGecko response
+  const coinPrice = coinHistory.prices.map((price) => price[1]);
+  const coinTimestamp = coinHistory.prices.map((price) =>
+    new Date(price[0]).toLocaleDateString()
+  );
 
   const data = {
     labels: coinTimestamp,
     datasets: [
       {
-        label: "Price In USD",
+        label: "Price in USD",
         data: coinPrice,
         fill: false,
-        borderColor: "#0071bd",
         backgroundColor: "#0071bd",
+        borderColor: "#0071bd",
       },
     ],
   };
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: "top" },
+      title: {
+        display: true,
+        text: `${coinName} Price Chart`,
+      },
+    },
     scales: {
-      y: { beginAtZero: false },
+      x: { display: true },
+      y: { display: true, beginAtZero: false },
     },
   };
 
