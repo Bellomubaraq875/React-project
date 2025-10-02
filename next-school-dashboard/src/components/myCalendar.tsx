@@ -51,7 +51,7 @@ export default function MyCalendar() {
         <div className="p-4 space-y-4">
             <Calendar
                 value={value}
-                onChange={handleDateChange} // now safe: handler accepts Date | Date[]
+                // onChange={handleDateChange} // now safe: handler accepts Date | Date[]
                 tileContent={({ date, view }) => {
                     if (view === "month") {
                         const dayEvents = events.filter((ev) => ev.date === formatDate(date));
