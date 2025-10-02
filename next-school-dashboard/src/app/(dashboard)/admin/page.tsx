@@ -1,5 +1,6 @@
 import AttendanceChart from "@/components/AttendanceChart";
 import CountChart from "@/components/CounterChart";
+import EventCalendar from "@/components/EventCalendar";
 import FinanceChart from "@/components/FinanceChart";
 import UserCard from "@/components/UserCard";
 
@@ -36,10 +37,9 @@ const AdminPage = () => {
             </div>
 
             {/* Right section */}
-            <div className="w-full lg:w-1/3 flex flex-col gap-4">
-                <div className="bg-primary text-white rounded-lg shadow p-4">
-                    <h2 className="text-lg font-semibold">Announcements</h2>
-                    <p className="text-sm opacity-80 mt-2">No new updates today.</p>
+            <div className="w-full lg:w-1/3 flex flex-col gap-8">
+                <div className="">
+                    <EventCalendar/>
                 </div>
 
                 <div className="bg-secondary text-white rounded-lg shadow p-4">

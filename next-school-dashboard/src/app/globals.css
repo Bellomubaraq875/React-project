@@ -1,3 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.react-calendar {
+  width: 100% !important;
+  border: 1px solid #E5E7EB !important; /* light gray border */
+  border-radius: 8px;
+  font-family: "Jost", sans-serif !important;
+  background-color: white;
+  padding: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Navigation bar (month/year header) */
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.react-calendar__navigation__label__labelText {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0F4F34; /* tlhgreen1 */
+}
+
+/* Weekday labels */
+.react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6B7280; /* Tailwind gray-500 */
+  margin-bottom: 4px;
+}
+
+/* Calendar tiles (days) */
+.react-calendar__tile {
+  border-radius: 6px;
+  padding: 8px 0;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.react-calendar__tile:hover {
+  background-color: #F3F4F6 !important; /* gray-100 hover */
+  color: #0F4F34;
+}
+
+/* Active (selected day) */
+.react-calendar__tile--active {
+  background-color: #00A064 !important; /* tlhgreen4 */
+  color: white !important;
+  font-weight: 600;
+}
+
+/* Today's date */
+.react-calendar__tile--now {
+  background-color: #87E9A9 !important; /* tlhlight1 */
+  color: #0F4F34 !important;
+  font-weight: 600;
+}
