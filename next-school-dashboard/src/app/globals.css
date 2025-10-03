@@ -124,7 +124,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   /* remove the forced width */
   width: auto !important;
-  max-width: 95% !important; /* leave some gap so events don't overlap completely */
+  /* max-width: 95% !important; leave some gap so events don't overlap completely */
 }
 
 /* If two events clash, show them side by side */

@@ -1105,32 +1105,32 @@ export const calendarEvents = [
   { title: "English", start: new Date(2025, 8, 29, 9, 0), end: new Date(2025, 8, 29, 9, 45) },
   { title: "Biology", start: new Date(2025, 8, 29, 10, 0), end: new Date(2025, 8, 29, 10, 45) },
   { title: "Physics", start: new Date(2025, 8, 29, 11, 0), end: new Date(2025, 8, 29, 11, 45) },
-  { title: "Chemistry", start: new Date(2025, 8, 29, 13, 0), end: new Date(2025, 8, 29, 13, 45) },
-  { title: "History", start: new Date(2025, 8, 29, 14, 0), end: new Date(2025, 8, 29, 14, 45) },
+  // { title: "Chemistry", start: new Date(2025, 8, 29, 13, 0), end: new Date(2025, 8, 29, 13, 45) },
+  // { title: "History", start: new Date(2025, 8, 29, 14, 0), end: new Date(2025, 8, 29, 14, 45) },
 
   // Tuesday (Sept 30, 2025)
   { title: "English", start: new Date(2025, 8, 30, 9, 0), end: new Date(2025, 8, 30, 9, 45) },
   { title: "Biology", start: new Date(2025, 8, 30, 10, 0), end: new Date(2025, 8, 30, 10, 45) },
   { title: "Physics", start: new Date(2025, 8, 30, 11, 0), end: new Date(2025, 8, 30, 11, 45) },
-  { title: "History", start: new Date(2025, 8, 30, 14, 0), end: new Date(2025, 8, 30, 14, 45) },
+  // { title: "History", start: new Date(2025, 8, 30, 14, 0), end: new Date(2025, 8, 30, 14, 45) },
 
   // Wednesday (Oct 1, 2025)
   { title: "Math", start: new Date(2025, 9, 1, 8, 0), end: new Date(2025, 9, 1, 8, 45) },
   { title: "Biology", start: new Date(2025, 9, 1, 10, 0), end: new Date(2025, 9, 1, 10, 45) },
   { title: "Chemistry", start: new Date(2025, 9, 1, 13, 0), end: new Date(2025, 9, 1, 13, 45) },
-  { title: "History", start: new Date(2025, 9, 1, 14, 0), end: new Date(2025, 9, 1, 14, 45) },
+  // { title: "History", start: new Date(2025, 9, 1, 14, 0), end: new Date(2025, 9, 1, 14, 45) },
 
   // Thursday (Oct 2, 2025)
   { title: "English", start: new Date(2025, 9, 2, 9, 0), end: new Date(2025, 9, 2, 9, 45) },
   { title: "Biology", start: new Date(2025, 9, 2, 10, 0), end: new Date(2025, 9, 2, 10, 45) },
   { title: "Physics", start: new Date(2025, 9, 2, 11, 0), end: new Date(2025, 9, 2, 11, 45) },
-  { title: "History", start: new Date(2025, 9, 2, 14, 0), end: new Date(2025, 9, 2, 14, 45) },
+  // { title: "History", start: new Date(2025, 9, 2, 14, 0), end: new Date(2025, 9, 2, 14, 45) },
 
   // Friday (Oct 3, 2025)
   { title: "Math", start: new Date(2025, 9, 3, 8, 0), end: new Date(2025, 9, 3, 8, 45) },
   { title: "English", start: new Date(2025, 9, 3, 9, 0), end: new Date(2025, 9, 3, 9, 45) },
   { title: "Physics", start: new Date(2025, 9, 3, 11, 0), end: new Date(2025, 9, 3, 11, 45) },
   { title: "Chemistry", start: new Date(2025, 9, 3, 13, 0), end: new Date(2025, 9, 3, 13, 45) },
-  { title: "History", start: new Date(2025, 9, 3, 14, 0), end: new Date(2025, 9, 3, 14, 45) },
+  // { title: "History", start: new Date(2025, 9, 3, 14, 0), end: new Date(2025, 9, 3, 14, 45) },
 ];
 
