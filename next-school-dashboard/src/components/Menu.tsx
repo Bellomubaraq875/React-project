@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { role } from "@/lib/data"; // make sure role is exported from your data.ts
 
 const menuItems = [
   {
@@ -31,41 +32,41 @@ const menuItems = [
   },
 ];
 
-const DEFAULT_ROLE = "teacher"; 
-
 const Menu = () => {
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((section) => (
         <div key={section.title} className="mb-6">
-          {/* Section Title - hidden on small screens */}
+          {/* Section Title */}
           <span className="hidden lg:block text-gray-500 text-xs font-semibold mb-2">
             {section.title}
           </span>
 
           <div className="flex flex-col gap-1 sm:gap-2">
-            {section.items.map((item) => (
-              <Link
-                href={item.href}
-                key={item.label}
-                className="flex items-center gap-2 sm:gap-3 p-2 rounded-md hover:bg-gray-100 transition"
-              >
-                {/* Responsive Icon */}
-                <div className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 relative">
-                  <Image
-                    src={item.icon}
-                    alt={item.label}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
+            {section.items
+              .filter((item) => item.visible.includes(role)) 
+              .map((item) => (
+                <Link
+                  href={item.href}
+                  key={item.label}
+                  className="flex items-center gap-2 sm:gap-3 p-2 rounded-md hover:bg-tlhlight1 transition"
+                >
+                  {/* Responsive Icon */}
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 relative">
+                    <Image
+                      src={item.icon}
+                      alt={item.label}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
 
-                {/* Label - hide on very small screens */}
-                <span className="hidden sm:block text-xs sm:text-sm md:text-base text-gray-700">
-                  {item.label}
-                </span>
-              </Link>
-            ))}
+                  {/* Label - hide on very small screens */}
+                  <span className="hidden sm:block text-xs sm:text-sm md:text-base text-gray-700">
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
           </div>
         </div>
       ))}
