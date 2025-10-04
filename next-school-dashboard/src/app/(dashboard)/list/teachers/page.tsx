@@ -2,45 +2,127 @@ import TableSearch from '@/components/TableSearch'
 import React from 'react'
 import Image from 'next/image'
 import Pagination from '@/components/Pagination'
+import Table from '@/components/Table'
+import Link from 'next/link'
+// import { TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { role, teachersData } from '@/lib/data'
+
+type Teacher = {
+    id: number;
+    teacherId: string;
+    name: string;
+    email?: string;
+    phone: string;
+    subjects: string[];
+    classes: string[];
+    address: string;
+    photo?: string;
+};
+
+const columns = [
+    {
+        header: "Info",
+        accessor: "info",
+    },
+    {
+        header: "Teacher ID",
+        accessor: "teacherId",
+        className: "hidden md:table-cell",
+    },
+    {
+        header: "Subjects",
+        accessor: "subjects",
+        className: "hidden md:table-cell",
+    },
+    {
+        header: "Classes",
+        accessor: "classes",
+        className: "hidden md:table-cell",
+    },
+    {
+        header: "Phone",
+        accessor: "phone",
+        className: "hidden md:table-cell",
+    },
+    {
+        header: "Address",
+        accessor: "address",
+        className: "hidden md:table-cell",
+    },
+    {
+        header: "Actions",
+        accessor: "action",
+    },
+];
 
 const TeacherListPage = () => {
+    const renderRow = (item: Teacher) => {
+        return (
+            <tr key={item.id} className="border-b">
+                <td className="flex items-center gap-4 py-2">
+                    <Image
+                        src={item.photo || "/default-teacher.png"}
+                        alt={item.name}
+                        width={40}
+                        height={40}
+                        className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex flex-col">
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-xs text-gray-500">{item?.email}</p>
+                    </div>
+                </td>
+                <td className="hidden md:table-cell">{item.teacherId}</td>
+                <td className="hidden md:table-cell">{item.subjects.join(", ")}</td>
+                <td className="hidden md:table-cell">{item.classes.join(", ")}</td>
+                <td className="hidden md:table-cell">{item.phone}</td>
+                <td className="hidden md:table-cell">{item.address}</td>
+                <td>
+                    <div className="flex items-center gap-2">
+                        <Link href={`/list/teachers/${item.id}`}>
+                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200">
+                                <Image src="/view.png" alt="view" width={16} height={16} />
+                            </button>
+                        </Link>
+                        {role === "admin" && (
+                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
+                                <Image src="/delete.png" alt="delete" width={16} height={16} />
+                            </button>
+                        )}
+                    </div>
+                </td>
+            </tr>
+        );
+    };
+
     return (
-        <div className='bg-white p-4 rounded-md flex-1 m-4 mt-4'>
+        <div className="bg-white p-4 rounded-md flex-1 m-4 mt-4">
             {/* top */}
             <div className="flex items-center justify-between">
-                <h1 className='hidden md:block text-lg font-semibold'>All Teachers</h1>
+                <h1 className="hidden md:block text-lg font-semibold">All Teachers</h1>
                 <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                     <TableSearch />
                     <div className="flex items-center gap-4 self-end">
-                        <button className='w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1'>
-                            <Image src="/filter.png" alt=""
-                                width={24}
-                                height={14}
-                            />
+                        <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+                            <Image src="/filter.png" alt="filter" width={24} height={14} />
                         </button>
-                        <button className='w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1'>
-                            <Image src="/sort.png" alt=""
-                                width={24}
-                                height={14}
-                            />
+                        <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+                            <Image src="/sort.png" alt="sort" width={24} height={14} />
                         </button>
-                        <button className='w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1'>
-                            <Image src="/plus.png" alt=""
-                                width={24}
-                                height={14}
-                            />
+                        <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+                            <Image src="/plus.png" alt="add" width={24} height={14} />
                         </button>
                     </div>
                 </div>
             </div>
+
             {/* List */}
-            <div className=""></div>
+            <Table columns={columns} renderRow={renderRow} data={teachersData} />
+
             {/* Pagination */}
-            <div className=""></div>
-            <Pagination/>
+            <Pagination />
         </div>
+    );
+};
 
-    )
-}
-
-export default TeacherListPage
+export default TeacherListPage;
