@@ -15,8 +15,8 @@ const ParentPage = () => {
             </div>
             {/* Right */}
             <div className="w-full xl:w-1/3 flex-col gap-8">
-                <EventCalendar />
-                <Announcements />
+                <EventCalendar/>
+                <Announcements/>
             </div>
         </div>
     )
