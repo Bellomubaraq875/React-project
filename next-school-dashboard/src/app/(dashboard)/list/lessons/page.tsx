@@ -1,0 +1,94 @@
+import TableSearch from '@/components/TableSearch'
+import React from 'react'
+import Image from 'next/image'
+import Pagination from '@/components/Pagination'
+import Table from '@/components/Table'
+import Link from 'next/link'
+import { lessonsData, role } from '@/lib/data'
+
+type Lesson = {
+  id: number
+  subject: string
+  teacher: string
+  class: string
+}
+
+const columns = [
+  {
+    header: 'Subject Name',
+    accessor: 'subject',
+  },
+  {
+    header: 'Class',
+    accessor: 'className',
+  },
+  {
+    header: 'Teacher',
+    accessor: 'teacher',
+    className: 'hidden md:table-cell',
+  },
+  {
+    header: 'Actions',
+    accessor: 'action',
+  },
+]
+
+const LessonListPage = () => {
+  const renderRow = (item: Lesson) => {
+    return (
+      <tr
+        key={item.id}
+        className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-tlhlight1"
+      >
+        <td className="flex items-center gap-4 py-2">{item.subject}</td>
+        <td>{item.class}</td>
+        <td className="hidden md:table-cell">{item.teacher}</td>
+        <td>
+          <div className="flex items-center gap-2">
+            <Link href={`/list/teachers/${item.id}`}>
+              <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200">
+                <Image src="/edit.png" alt="view" width={16} height={16} />
+              </button>
+            </Link>
+            {role === 'admin' && (
+              <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
+                <Image src="/delete.png" alt="delete" width={16} height={16} />
+              </button>
+            )}
+          </div>
+        </td>
+      </tr>
+    )
+  }
+
+  return (
+    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-4">
+      {/* top */}
+      <div className="flex items-center justify-between">
+        <h1 className="hidden md:block text-lg font-semibold">Lessons</h1>
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+          <TableSearch />
+          <div className="flex items-center gap-4 self-end">
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+              <Image src="/filter.png" alt="filter" width={24} height={14} />
+            </button>
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+              <Image src="/sort.png" alt="sort" width={24} height={14} />
+            </button>
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+              <Image src="/plus.png" alt="add" width={24} height={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* List */}
+      <Table columns={columns} renderRow={renderRow} data={lessonsData} />
+
+      {/* Pagination */}
+      <Pagination />
+    </div>
+  )
+}
+
+export default LessonListPage
