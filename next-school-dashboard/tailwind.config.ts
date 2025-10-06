@@ -18,7 +18,7 @@ const config: Config = {
         tlhgreen2: "#046645",
         tlhgreen3: "#067A52",
         tlhgreen4: "#00A064",
-        tlhlight1: "#87E9A9",
+        tlhlight1: "#87E9A6",
         tlhlight2: "#3FC283",
       },
     },
