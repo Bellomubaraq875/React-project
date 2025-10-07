@@ -46,12 +46,12 @@ const FinanceChart = () => {
                     <XAxis
                         dataKey="name"
                         axisLine={false}
-                        tick={{ fill: "#9CA3AF", fontSize: 12 }}
+                        tick={{ fill: "#000", fontSize: 12 }}
                         tickLine={false}
                     />
                     <YAxis
                         axisLine={false}
-                        tick={{ fill: "#9CA3AF", fontSize: 12 }}
+                        tick={{ fill: "#000", fontSize: 12 }}
                         tickLine={false}
                     />
                     <Tooltip />
