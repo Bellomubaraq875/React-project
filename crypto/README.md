@@ -7,7 +7,7 @@ It fetches live crypto market data using the **CoinGecko API** and displays it i
 ---
 
 ## 🚀 Live Demo
-- **Vercel:** [bellobrightcryptoapp.vercel.app](https://crypto-plum-phi.vercel.app)
+- **Vercel:** crypto-plum-phi.vercel.app
 
 ---
 
