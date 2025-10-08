@@ -82,11 +82,12 @@ const StudentListPage = () => {
                             <Image src="/sort.png" alt="sort" width={24} height={14} />
                         </button>
 
-                        {/* ✅ Fixed syntax: Removed misplaced double quotes */}
+                        
                         {role === "admin" && (
-                            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
-                                <Image src="/plus.png" alt="add" width={24} height={14} />
-                            </button>
+                            // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+                            //     <Image src="/plus.png" alt="add" width={24} height={14} />
+                            // </button>
+                            <FormModal table='teacher' type='delete' id={item.id} />
                         )}
                     </div>
                 </div>

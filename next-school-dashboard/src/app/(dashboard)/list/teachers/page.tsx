@@ -6,6 +6,7 @@ import Table from '@/components/Table'
 import Link from 'next/link'
 // import { TrashIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { role, teachersData } from '@/lib/data'
+import FormModal from '@/components/FormModal'
 
 type Teacher = {
     id: number;
@@ -83,11 +84,13 @@ const TeacherListPage = () => {
                             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-blue-200">
                                 <Image src="/view.png" alt="view" width={16} height={16} />
                             </button>
+                            
                         </Link>
                         {role === "admin" && (
-                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
-                                <Image src="/delete.png" alt="delete" width={16} height={16} />
-                            </button>
+                            // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
+                            //     <Image src="/delete.png" alt="delete" width={16} height={16} />
+                            // </button>
+                            <FormModal table='teacher' type='create'/>
                         )}
                     </div>
                 </td>
@@ -109,9 +112,12 @@ const TeacherListPage = () => {
                         <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
                             <Image src="/sort.png" alt="sort" width={24} height={14} />
                         </button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
-                            <Image src="/plus.png" alt="add" width={24} height={14} />
-                        </button>
+                        {role === "admin" && (
+                            {/* <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+                                <Image src="/plus.png" alt="add" width={24} height={14} />
+                            </button> */}
+                        <FormModal table='teacher' type='delete' id={item.id}/>
+                        )}
                     </div>
                 </div>
             </div>
