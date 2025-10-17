@@ -5,6 +5,7 @@ import Pagination from '@/components/Pagination';
 import Table from '@/components/Table';
 import Link from 'next/link';
 import { role, studentsData } from '@/lib/data';
+import FormModal from '@/components/FormModal';
 
 type Student = {
     id: number;
@@ -33,7 +34,7 @@ const StudentListPage = () => {
         <tr key={item.id} className="border-b">
             <td className="flex items-center gap-4 py-2">
                 <Image
-                    src={item.photo || "/default-user.png"} // fallback image
+                    src={item.photo || "/default-user.png"} // fallback image\\\\\
                     alt={item.name}
                     width={40}
                     height={40}
@@ -57,9 +58,10 @@ const StudentListPage = () => {
                         </button>
                     </Link>
                     {role === "admin" && (
-                        <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
-                            <Image src="/delete.png" alt="delete" width={16} height={16} />
-                        </button>
+                        // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
+                        //     <Image src="/delete.png" alt="delete" width={16} height={16} />
+                        // </button>
+                        <FormModal table = "student" type="delete" id={item.id}/>
                     )}
                 </div>
             </td>
@@ -87,7 +89,7 @@ const StudentListPage = () => {
                             // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
                             //     <Image src="/plus.png" alt="add" width={24} height={14} />
                             // </button>
-                            <FormModal table='teacher' type='delete' id={item.id} />
+                            <FormModal table = "student" type="create"/>
                         )}
                     </div>
                 </div>

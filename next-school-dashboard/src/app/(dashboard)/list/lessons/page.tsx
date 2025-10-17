@@ -5,6 +5,7 @@ import Pagination from '@/components/Pagination'
 import Table from '@/components/Table'
 import Link from 'next/link'
 import { lessonsData, role } from '@/lib/data'
+import FormModal from '@/components/FormModal'
 
 type Lesson = {
   id: number
@@ -51,9 +52,10 @@ const LessonListPage = () => {
               </button>
             </Link>
             {role === 'admin' && (
-              <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
-                <Image src="/delete.png" alt="delete" width={16} height={16} />
-              </button>
+              // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CFCEFF]">
+              //   <Image src="/delete.png" alt="delete" width={16} height={16} />
+              // </button>
+              <FormModal table="lesson" type="delete" id={item.id}/>
             )}
           </div>
         </td>
@@ -75,9 +77,12 @@ const LessonListPage = () => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
               <Image src="/sort.png" alt="sort" width={24} height={14} />
             </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
-              <Image src="/plus.png" alt="add" width={24} height={14} />
-            </button>
+            {role === "admin" && (
+              // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-tlhlight1">
+              //   <Image src="/plus.png" alt="add" width={24} height={14} />
+              // </button>
+              <FormModal table="lesson" type="create"/>
+            )}
           </div>
         </div>
       </div>
