@@ -46,8 +46,8 @@ To get this project up and running on your local machine, follow these steps:
 
 Clone the repository:
 
-git clone <repository_url>
-cd <project_directory>
+git clone <https://github.com/Bellomubaraq875/React-project/tree/master>
+cd <new dashboard>
 
 Install dependencies:
 

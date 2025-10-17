@@ -1,44 +1,54 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("Missing GEMINI_API_KEY in environment variables");
+}
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(request: Request) {
   try {
     const { image } = await request.json();
-    const base64Data = image.split(",")[1];
+
+    // Ensure image string is valid
+    const base64Data = image.includes(",") ? image.split(",")[1] : image;
+    const mimeType = image.includes("image/png")
+      ? "image/png"
+      : "image/jpeg"; // fallback to jpeg if unknown
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-    const prompt = `Analyze this emergency situation image and respond in this exact format without any asterisks or bullet points:
-TITLE: Write a clear, brief title
-TYPE: Choose one (Theft, Fire Outbreak, Medical Emergency, Natural Disaster, Violence, or Other)
-DESCRIPTION: Write a clear, concise description`;
+    const prompt = `Analyze this emergency situation image and respond in this exact format:
+TITLE: <clear brief title>
+TYPE: <Theft, Fire Outbreak, Medical Emergency, Natural Disaster, Violence, Other>
+DESCRIPTION: <clear concise description>`;
 
     const result = await model.generateContent([
       prompt,
       {
         inlineData: {
           data: base64Data,
-          mimeType: "image/jpeg",
+          mimeType,
         },
       },
     ]);
 
-    const text = await result.response.text(); // Ensure text() is awaited
+    const text = (await result.response.text()).trim();
 
-    // Parse the response more precisely
-    const titleMatch = text.match(/TITLE:\s*(.+)/);
-    const typeMatch = text.match(/TYPE:\s*(.+)/);
-    const descMatch = text.match(/DESCRIPTION:\s*(.+)/);
+    // More resilient parsing
+    const titleMatch = text.match(/TITLE:\s*([^\n]+)/i);
+    const typeMatch = text.match(/TYPE:\s*([^\n]+)/i);
+    const descMatch = text.match(/DESCRIPTION:\s*([\s\S]+)/i);
 
     return NextResponse.json({
       title: titleMatch?.[1]?.trim() || "",
       reportType: typeMatch?.[1]?.trim() || "",
       description: descMatch?.[1]?.trim() || "",
+      rawResponse: text, // keep raw for debugging
     });
-  } catch (error) {
-    console.error("Image analysis error:", error);
+  } catch (error: any) {
+    console.error("Image analysis error:", error.message, error.stack);
     return NextResponse.json(
       { error: "Failed to analyze image" },
       { status: 500 }
