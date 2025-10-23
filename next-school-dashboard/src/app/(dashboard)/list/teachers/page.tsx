@@ -6,6 +6,7 @@ import Table from '@/components/Table'
 import Link from 'next/link'
 import { role, teachersData } from '@/lib/data'
 import FormModal from '@/components/FormModal'
+import { Teacher } from '@prisma/client'
 
 type Teacher = {
     id: number;
@@ -61,7 +62,7 @@ const TeacherListPage = () => {
             <tr key={item.id} className="border-b">
                 <td className="flex items-center gap-4 py-2">
                     <Image
-                        src={item.photo || "/default-teacher.png"}
+                        src={item.photo || "/noAvatar.png"}
                         alt={item.name}
                         width={40}
                         height={40}
